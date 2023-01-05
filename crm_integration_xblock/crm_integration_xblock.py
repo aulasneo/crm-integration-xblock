@@ -1,13 +1,13 @@
 """
 CRM Integration Xblock.
 
-This module is the actual implemetation of the Xblock related classes
+This module is the actual implementation of the Xblock related classes
 """
 
 import json
 
 from collections import OrderedDict
-from urllib import urlencode
+from urllib.parse import urlencode
 from opaque_keys.edx.keys import CourseKey
 
 import requests
@@ -46,7 +46,7 @@ class CrmIntegration(StudioEditableXBlockMixin, XBlock):
     backend_name = String(help="Please write the name of the backend. "
                           "Normally it is the name of the project you are working on",
                           scope=Scope.content,
-                          display_name="Name of your proyect")
+                          display_name="Name of your project")
 
     url = String(help="The URL for sandbox is https://test.salesforce.com/services/oauth2/token "
                  "and for production https://login.salesforce.com/services/oauth2/token",
@@ -133,7 +133,7 @@ class CrmIntegration(StudioEditableXBlockMixin, XBlock):
                                         username=username,
                                         password="{}{}".format(password, security_token)))
 
-        headers = {'content-type': "application/x-www-form-urlencoded",}
+        headers = {'content-type': "application/x-www-form-urlencoded", }
         response = requests.request("POST", url, data=payload, headers=headers)
 
         if response.status_code == 200:
@@ -144,7 +144,7 @@ class CrmIntegration(StudioEditableXBlockMixin, XBlock):
 
     def _init_fs_class(self, data):
         """
-        This method receive data to proccess CRM request
+        This method receive data to process CRM request
         """
         is_studio = hasattr(self.xmodule_runtime, 'is_author_mode')  # pylint: disable=no-member
         data_no_init = data.get("no_init", False)
@@ -176,7 +176,7 @@ class CrmIntegration(StudioEditableXBlockMixin, XBlock):
             access_token = response_salesforce["access_token"]
             instance_url = response_salesforce["instance_url"]
             username = self.get_anonymous_id_comp_crm()
-            if isinstance(data, basestring):
+            if isinstance(data, str):
                 data = json.loads(data)
             method = data.get("method", None)
             initial = data.get("initial", None)
@@ -189,12 +189,12 @@ class CrmIntegration(StudioEditableXBlockMixin, XBlock):
                 initial
             )
             emit("crm_integration_xblock.initialization.{}.success".format(backend_name), 10)
-            return {"status_code":token.status_code}
+            return {"status_code": token.status_code}
 
     @XBlock.json_handler
     def send_crm_data(self, data, suffix=''):
         """
-        This method sends the data to the appropiate backend which in turn sends it to the CRM
+        This method sends the data to the appropriate backend which in turn sends it to the CRM
         """
         # pylint: disable=unused-argument
         crm_data = self._init_fs_class(data)
@@ -207,7 +207,7 @@ class CrmIntegration(StudioEditableXBlockMixin, XBlock):
     @XBlock.json_handler
     def delete_crm_data(self, data, suffix=''):
         """
-        This method DELETE the data to the appropiate backend which in turn sends it to the CRM
+        This method DELETE the data to the appropriate backend which in turn sends it to the CRM
         """
         # pylint: disable=unused-argument
         crm_data = self._init_fs_class(data)
@@ -236,14 +236,14 @@ class CrmIntegration(StudioEditableXBlockMixin, XBlock):
 
     def get_anonymous_id_comp_crm(self):
         """
-        Helper method to obtain the correct compability anonymous_id.
-        Return the compability anonymous_id found in the model of the user, if it exists,
+        Helper method to obtain the correct compatibility anonymous_id.
+        Return the compatibility anonymous_id found in the model of the user, if it exists,
         otherwise returns the current anonymous_id
         """
         current_anonymous_student_id = self.runtime.anonymous_student_id
         user = self.runtime.get_real_user(current_anonymous_student_id)
-        course_id_str = unicode(self.runtime.course_id)
-        # Create a compability course id with suffix _CRM_XBLOCK
+        course_id_str = str(self.runtime.course_id)
+        # Create a compatibility course id with suffix _CRM_XBLOCK
         compat_course_id = CourseKey.from_string('{}_CRM_XBLOCK'.format(course_id_str))
         try:
             # Check if the user has a previous assigned anonymous_id

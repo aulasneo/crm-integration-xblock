@@ -1,3 +1,5 @@
 # Base requirements
-git+https://github.com/edx/XBlock.git@xblock-0.4.10#egg=XBlock==0.4.10
 git+https://github.com/edx/xblock-utils@v1.0.2#egg=xblock-utils==1.0.2
+setuptools~=65.6.3
+requests~=2.28.1
+XBlock~=1.6.1
